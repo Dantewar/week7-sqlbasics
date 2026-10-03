@@ -116,3 +116,78 @@ ORDER BY authors.name, books.title;
 --
 -- PostgreSQL returns a foreign key constraint error because
 -- books.author_id must reference an existing authors.id.
+
+
+-- ============================================
+-- 3. Many-to-Many Relationship
+-- students -> student_courses -> courses
+-- ============================================
+
+DROP TABLE IF EXISTS student_courses;
+DROP TABLE IF EXISTS courses;
+DROP TABLE IF EXISTS students;
+
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE courses (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE student_courses (
+    student_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id),
+
+    PRIMARY KEY (student_id, course_id)
+);
+
+INSERT INTO students (name)
+VALUES
+    ('Dante'),
+    ('Bianca'),
+    ('Shanti');
+
+INSERT INTO courses (name)
+VALUES
+    ('SQL'),
+    ('TypeScript'),
+    ('Backend Development');
+
+INSERT INTO student_courses (student_id, course_id)
+VALUES
+    (1, 1),
+    (1, 2),
+    (1, 3),
+    (2, 1),
+    (2, 3),
+    (3, 1);
+
+SELECT
+    students.name AS student,
+    courses.name AS course
+FROM students
+JOIN student_courses
+    ON students.id = student_courses.student_id
+JOIN courses
+    ON courses.id = student_courses.course_id
+ORDER BY students.name, courses.name;
+
+
+-- Constraint test:
+-- This would fail because the combination (1, 1)
+-- already exists in student_courses.
+--
+-- INSERT INTO student_courses (student_id, course_id)
+-- VALUES (1, 1);
+--
+-- PostgreSQL returns a duplicate key error because
+-- (student_id, course_id) is a composite primary key.
+--
+-- This prevents the same student from being added
+-- to the same course more than once.
