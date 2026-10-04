@@ -63,3 +63,27 @@ WHERE facs.name IN ('Tennis Court 1', 'Tennis Court 2')
   AND bks.starttime >= '2012-09-21'
   AND bks.starttime < '2012-09-22'
 ORDER BY bks.starttime;
+
+
+-- 3. Produce a list of all members who have recommended another member
+
+SELECT DISTINCT
+    mems.firstname,
+    mems.surname
+FROM cd.members mems
+JOIN cd.members recs
+    ON recs.recommendedby = mems.memid
+ORDER BY mems.surname, mems.firstname;
+
+
+-- 4. Produce a list of all members, along with their recommender
+
+SELECT
+    mems.firstname AS member_firstname,
+    mems.surname AS member_surname,
+    recs.firstname AS recommender_firstname,
+    recs.surname AS recommender_surname
+FROM cd.members mems
+LEFT OUTER JOIN cd.members recs
+    ON recs.memid = mems.recommendedby
+ORDER BY mems.surname, mems.firstname;
