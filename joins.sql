@@ -1,5 +1,10 @@
 -- ============================================
 -- Week 7 - SQL Joins Homework
+-- Country Club Relationships, JOINs & Subqueries
+-- ============================================
+
+
+-- ============================================
 -- Skill 2: Country Club Relationships
 -- ============================================
 
@@ -29,3 +34,32 @@
 -- One member can recommend another member.
 -- The recommendedby column contains the memid
 -- of another row in the same cd.members table.
+
+
+-- ============================================
+-- Skill 3: Joins and Subqueries Exercises
+-- ============================================
+
+
+-- 1. Retrieve the start times of members' bookings
+
+SELECT bks.starttime
+FROM cd.bookings bks
+JOIN cd.members mems
+    ON mems.memid = bks.memid
+WHERE mems.firstname = 'David'
+  AND mems.surname = 'Farrell';
+
+
+-- 2. Work out the start times of bookings for tennis courts
+
+SELECT
+    bks.starttime AS start,
+    facs.name
+FROM cd.facilities facs
+JOIN cd.bookings bks
+    ON facs.facid = bks.facid
+WHERE facs.name IN ('Tennis Court 1', 'Tennis Court 2')
+  AND bks.starttime >= '2012-09-21'
+  AND bks.starttime < '2012-09-22'
+ORDER BY bks.starttime;
