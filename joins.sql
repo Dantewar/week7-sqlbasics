@@ -126,3 +126,44 @@ WHERE bks.starttime >= '2012-09-14'
         (mems.memid <> 0 AND bks.slots * facs.membercost > 30)
       )
 ORDER BY cost DESC;
+
+
+-- 7. Produce a list of all members,
+--    along with their recommender, using no joins
+
+SELECT
+    mems.firstname || ' ' || mems.surname AS member,
+    (
+        SELECT recs.firstname || ' ' || recs.surname
+        FROM cd.members recs
+        WHERE recs.memid = mems.recommendedby
+    ) AS recommender
+FROM cd.members mems
+ORDER BY member;
+
+
+-- 8. Produce a list of costly bookings, using a subquery
+
+SELECT
+    member,
+    facility,
+    cost
+FROM (
+    SELECT
+        mems.firstname || ' ' || mems.surname AS member,
+        facs.name AS facility,
+        CASE
+            WHEN mems.memid = 0
+                THEN bks.slots * facs.guestcost
+            ELSE bks.slots * facs.membercost
+        END AS cost
+    FROM cd.members mems
+    JOIN cd.bookings bks
+        ON mems.memid = bks.memid
+    JOIN cd.facilities facs
+        ON bks.facid = facs.facid
+    WHERE bks.starttime >= '2012-09-14'
+      AND bks.starttime < '2012-09-15'
+) AS bookings
+WHERE cost > 30
+ORDER BY cost DESC;
